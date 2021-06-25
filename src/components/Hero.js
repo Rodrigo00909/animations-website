@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import { FaSlideshare } from 'react-icons/fa';
 import styled, {css} from 'styled-components/macro';
 import { Button } from './Button';
@@ -76,7 +76,7 @@ const HeroContent = styled.div`
     color: #fff;
 
     h1 {
-        font-size: clamp(1rem, 8vw, 2rem); // Sizes for h1 responsive
+        font-size: clamp(1rem, 8vw, 2rem); // Sizes for h1 // responsive
         font-weight: 400;
         text-transform: uppercase;
         text-shadow: 0px 0px 20px rgba(0,0,0,0.4);
@@ -90,7 +90,9 @@ const HeroContent = styled.div`
     }
 `;
 
-const Arrow = styled(IoMdArrowRoundForward)``;
+const Arrow = styled(IoMdArrowRoundForward)`
+    margin-left: 0.5rem;
+`;
 
 const SliderButtons = styled.div`
     position: absolute;
@@ -127,29 +129,77 @@ const PrevArrow = styled(IoArrowBack)`
 `;
 
 const Hero = ({ slides }) => {
+
+    // Hook
+    const [current, setCurrent] = useState(0);
+    const length = slides.length
+    const timeout = useRef(null)
+
+    // Animated slider
+    /* useEffect( () => {
+        const nextSlide = () => {
+            setCurrent(current => (current === length - 1 ? 0 : current + 1))
+        }
+
+        // Cambia el valor, hacer funcionar la funcion nextSlide
+        timeout.current = setTimeout(nextSlide, 4000); 
+
+        return function () {
+            if(timeout.current) {
+                clearTimeout(timeout.current)
+            }
+        }
+    }, [current, length]); */
+
+    const nextSlide = () => {
+
+        if(timeout.current) {
+            clearTimeout(timeout.current)
+        }
+
+        setCurrent(current === length - 1 ? 0 : current + 1) // si el valor actual es igual al tamaño -1 quiero retornar el primer valor
+        //console.log(current);
+    }
+
+    const prevSlide = () => {
+
+        if(timeout.current) {
+            clearTimeout(timeout.current)
+        }
+        setCurrent(current === 0 ? length - 1 : current - 1)
+        //console.log(current);
+    }
+
+    if(!Array.isArray(slides) || slides.length <= 0) {
+        return null
+    } // check para retornar nada
+
     return (
         <HeroSection>
             <HeroWrapper>
-                {slides.map( (slide, index) => {
+                {slides.map( (slide, index) => { // mapeo de la data
                     return (
                         <HeroSlide key={index}>
-                            <HeroSlider>
-                                <HeroImage src={slide.image} alt={slide.alt} />
-                                <HeroContent>
-                                    <h1>{slide.title}</h1>
-                                    <p>{slide.price}</p>
-                                    <Button to={slide.path} primary='true' css={`max-width: 160px;`}>
-                                        {slide.label}
-                                        <Arrow />
-                                    </Button>
-                                </HeroContent>
-                            </HeroSlider>
+                            {index === current && ( // Mostrar toda la data
+                                <HeroSlider>
+                                    <HeroImage src={slide.image} alt={slide.alt} />
+                                    <HeroContent>
+                                        <h1>{slide.title}</h1>
+                                        <p>{slide.price}</p>
+                                        <Button to={slide.path} primary='true' css={`max-width: 160px;`}>
+                                            {slide.label}
+                                            <Arrow />
+                                        </Button>
+                                    </HeroContent>
+                                </HeroSlider>
+                            )}
+                            
                         </HeroSlide>
                     )
                 })}
                 <SliderButtons>
-                    <PrevArrow />
-                    <NextArrow />
+                    <PrevArrow onClick={prevSlide} />
+                    <NextArrow onClick={nextSlide} />
                 </SliderButtons>
             </HeroWrapper>
         </HeroSection>
