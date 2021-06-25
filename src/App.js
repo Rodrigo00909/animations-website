@@ -6,6 +6,7 @@ import Hero from './components/Hero'
 import { SliderData } from './data/SliderData';
 import Dropdown from './components/Dropdown';
 import Info from './components/Info';
+import { infoData } from './data/InfoData';
 
 function App() {
 
@@ -21,7 +22,7 @@ function App() {
       <Navbar toggle={toggle} />
       <Dropdown isOpen={isOpen} toggle={toggle} />
       <Hero slides={SliderData} />
-      <Info />
+      <Info {...infoData}/>
     </div>
   );
 }
